@@ -1,0 +1,30 @@
+---
+services:
+- id: a72595f2-6da9-484b-ab7a-472fdcaa7143 # must be unique
+  name: k8s-osb-postgres # must be unique
+  description: PostgreSQL on Kubernetes
+  bindable: true
+  planUpdateable: false
+  requires: []
+  tags:
+  - postgresql
+  metadata:
+    displayName: PostgreSQL on Kubernetes
+    documentationUrl: https://twitter.com/making
+    imageUrl: https://www.postgresql.org/media/img/about/press/elephant64.png
+    longDescription: Demo
+    providerDisplayName: "@making"
+    supportUrl: https://twitter.com/making
+  plans:
+  - id: 5e0e3881-ec1e-4d73-b4ef-103b6eb9d468 # must be unique
+    name: 1g
+    description: 1GB disk
+    free: true
+    metadata:
+      displayName: 1g
+      bullets:
+      - 1gb disk
+      costs:
+      - amount:
+          usd: 0
+        unit: MONTHLY

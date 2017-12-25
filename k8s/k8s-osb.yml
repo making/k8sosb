@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: k8s-osb-secret
+  namespace: osb
+type: Opaque
+data:
+  username: dXNlcm5hbWU=
+  password: cGFzc3dvcmQ=
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: k8s-osb-service
+  namespace: osb
+  labels:
+    app: k8s-osb
+spec:
+  selector:
+    app: k8s-osb
+  ports:
+  - protocol: TCP
+    port: 8080
+    nodePort: 30657
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: k8s-osb-deployment
+  namespace: osb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: k8s-osb
+      labels:
+        app: k8s-osb
+    spec:
+      containers:
+      - name: k8s-osb
+        image: making/k8s-osb:0.0.3-SNAPSHOT
+        env:
+        - name: SERVICE_INSTANCE_NS
+          value: demo
+        - name: SECURITY_USER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: k8s-osb-secret
+              key: username
+        - name: SECURITY_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: k8s-osb-secret
+              key: password
+        volumeMounts:
+        - name: kube-config
+          mountPath: "/root/.kube"
+          readOnly: true
+        - name: client-tls
+          mountPath: "/Users/makit/.minikube"
+          readOnly: true
+      volumes:
+      - name: kube-config
+        secret:
+          secretName: kube-config
+          items:
+          - key: kube-config
+            path: config
+      - name: client-tls
+        secret:
+          secretName: kube-config
+          items:
+          - key: client-certificate
+            path: client.crt
+          - key: client-key
+            path: client.key
+          - key: ca-cert
+            path: ca.crt
+
+# kubectl create secret -n osb generic kube-config --from-file=kube-config=${HOME}/.kube/config --from-file=client-certificate=${HOME}/.minikube/client.crt --from-file=client-key=${HOME}/.minikube/client.key --from-file=ca-cert=${HOME}/.minikube/ca.crt
